@@ -1,0 +1,2846 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Finanzas familiares</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-2: #f1f3f5;
+      --ink: #101827;
+      --muted: #667085;
+      --line: #e1e5ea;
+      --accent: #102a43;
+      --accent-2: #2f5373;
+      --accent-soft: #eef3f8;
+      --good: #183b5b;
+      --good-soft: #edf3f8;
+      --bad: #6b7280;
+      --bad-soft: #f2f4f7;
+      --warn: #475467;
+      --warn-soft: #f6f7f9;
+      --teal: #4f6f8f;
+      --income: #16a34a;
+      --expense: #ef4444;
+      --shadow: 0 1px 2px rgba(16, 24, 39, 0.04);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--ink);
+      min-height: 40px;
+      padding: 0 14px;
+      cursor: pointer;
+      transition: border-color 140ms ease, background 140ms ease, transform 140ms ease;
+    }
+
+    button:hover {
+      border-color: #b8c0cc;
+      background: #fafbfc;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+      font-weight: 650;
+    }
+
+    button.primary:hover {
+      background: #0b1f33;
+    }
+
+    button.subtle {
+      background: var(--surface-2);
+    }
+
+    button.danger {
+      color: var(--bad);
+      border-color: #c9ced6;
+      background: var(--bad-soft);
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      min-height: 40px;
+      padding: 0 10px;
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    input[type="file"] {
+      min-height: auto;
+      padding: 10px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 650;
+    }
+
+    .app-shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 0 16px;
+    }
+
+    .brand {
+      min-width: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.35rem, 2.5vw, 2rem);
+      letter-spacing: 0;
+      line-height: 1.05;
+    }
+
+    .brand p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 8px 0 14px;
+    }
+
+    .tab {
+      white-space: nowrap;
+      border-color: transparent;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .tab.active {
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-color: #cfd9e4;
+    }
+
+    .status-line {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .message {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+
+    .message-text {
+      min-width: 0;
+    }
+
+    .message-close {
+      min-width: 28px;
+      min-height: 28px;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      padding: 0;
+      display: inline-grid;
+      place-items: center;
+      line-height: 1;
+      color: var(--muted);
+      background: transparent;
+    }
+
+    .message.good {
+      color: var(--good);
+      border-color: #cbd8e4;
+      background: var(--good-soft);
+    }
+
+    .message.warn {
+      color: var(--warn);
+      border-color: #d0d5dd;
+      background: var(--warn-soft);
+    }
+
+    .message.hidden {
+      display: none;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(120px, 0.7fr)) minmax(260px, 1.25fr) minmax(260px, 1fr) minmax(220px, 0.9fr);
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 14px;
+      padding: 12px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .period-filter {
+      display: grid;
+      grid-template-columns: 210px 210px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      margin-bottom: 14px;
+      padding: 12px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .period-group {
+      display: grid;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .period-title {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 650;
+    }
+
+    .period-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .period-buttons.quarters {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .period-buttons.months {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .period-buttons.months .choice-btn {
+      flex: 0 0 auto;
+    }
+
+    .year-wheel {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) 34px;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .year-step {
+      min-height: 34px;
+      width: 34px;
+      padding: 0;
+      border-radius: 999px;
+      font-size: 1rem;
+    }
+
+    .year-current {
+      min-height: 34px;
+      border-radius: 999px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 8px;
+      align-items: center;
+      padding: 0 10px;
+      font-weight: 750;
+      color: var(--accent);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .year-current.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .year-adjacent {
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 650;
+      text-align: center;
+      opacity: 0.78;
+    }
+
+    .button-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 34px;
+      align-items: center;
+    }
+
+    .check-dropdown {
+      position: relative;
+      min-width: 0;
+    }
+
+    .check-dropdown summary {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      padding: 0 12px;
+      color: var(--ink);
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .check-dropdown summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .check-dropdown summary::after {
+      content: "⌄";
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .check-dropdown[open] summary {
+      border-color: #b8c0cc;
+      box-shadow: 0 0 0 3px rgba(16, 42, 67, 0.08);
+    }
+
+    .check-menu {
+      position: absolute;
+      z-index: 20;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      max-height: 320px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 18px 36px rgba(16, 24, 39, 0.12);
+      padding: 6px;
+    }
+
+    .check-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 6px 8px;
+      border-radius: 7px;
+      color: var(--ink);
+      font-size: 0.86rem;
+    }
+
+    .check-row:hover {
+      background: var(--surface-2);
+    }
+
+    .check-row.excluded {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      color: var(--accent);
+      font-weight: 650;
+    }
+
+    .check-row input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+    }
+
+    .check-count {
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .choice-btn {
+      min-height: 32px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      background: #f8fafc;
+      color: var(--muted);
+      user-select: none;
+    }
+
+    .choice-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .kpi {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .kpi span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    .kpi strong {
+      display: block;
+      margin-top: 7px;
+      font-size: clamp(1.22rem, 3vw, 1.9rem);
+      line-height: 1.12;
+      overflow-wrap: anywhere;
+    }
+
+    .kpi.good strong {
+      color: var(--good);
+    }
+
+    .kpi.bad strong {
+      color: var(--bad);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(290px, 0.75fr);
+      gap: 14px;
+    }
+
+    .wide-panel {
+      grid-column: 1 / -1;
+    }
+
+    .panel {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 1rem;
+      letter-spacing: 0;
+    }
+
+    .chart-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .cashflow-chart {
+      min-height: 340px;
+      overflow-x: auto;
+      padding: 2px 0 0;
+    }
+
+    .cashflow-svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .cashflow-zero {
+      stroke: #cfd6df;
+      stroke-width: 1;
+    }
+
+    .cashflow-guide {
+      stroke: #eef1f5;
+      stroke-width: 1;
+    }
+
+    .cashflow-line {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 2.4;
+    }
+
+    .cashflow-line.income {
+      stroke: var(--income);
+    }
+
+    .cashflow-line.expense {
+      stroke: var(--expense);
+    }
+
+    .cashflow-line.cumulative {
+      stroke: #12345a;
+      stroke-width: 4;
+    }
+
+    .cashflow-area {
+      opacity: 0.95;
+    }
+
+    .cashflow-point {
+      stroke: var(--surface);
+      stroke-width: 2;
+    }
+
+    .cashflow-point.income {
+      fill: var(--income);
+    }
+
+    .cashflow-point.expense {
+      fill: var(--expense);
+    }
+
+    .cashflow-point.cumulative {
+      fill: #12345a;
+    }
+
+    .cashflow-value {
+      font-size: 0.67rem;
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+      paint-order: stroke;
+      stroke: var(--surface);
+      stroke-width: 4px;
+      stroke-linejoin: round;
+    }
+
+    .cashflow-value.income {
+      fill: var(--income);
+    }
+
+    .cashflow-value.expense {
+      fill: var(--expense);
+    }
+
+    .cashflow-value.cumulative {
+      fill: #12345a;
+      font-weight: 750;
+    }
+
+    .cashflow-month-label,
+    .cashflow-year-label {
+      fill: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 650;
+      letter-spacing: 0;
+    }
+
+    .cashflow-year-label {
+      fill: var(--ink);
+      font-size: 0.76rem;
+    }
+
+    .category-table {
+      display: grid;
+      gap: 8px;
+    }
+
+    .category-donut-layout {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+    }
+
+    .donut {
+      width: 150px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: conic-gradient(var(--line) 0 100%);
+      position: relative;
+      box-shadow: inset 0 0 0 1px rgba(21, 32, 43, 0.08);
+    }
+
+    .donut::after {
+      content: "";
+      position: absolute;
+      inset: 30px;
+      border-radius: 50%;
+      background: var(--surface);
+      box-shadow: 0 0 0 1px rgba(21, 32, 43, 0.06);
+    }
+
+    .donut-total {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: grid;
+      place-content: center;
+      text-align: center;
+      font-weight: 750;
+      font-size: 0.9rem;
+      padding: 38px;
+    }
+
+    .donut-total span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.66rem;
+      font-weight: 650;
+      margin-top: 4px;
+    }
+
+    .category-row {
+      display: grid;
+      grid-template-columns: 12px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 36px;
+      border-bottom: 1px solid var(--line);
+      padding: 7px 0;
+      font-size: 0.9rem;
+    }
+
+    .category-row:last-child {
+      border-bottom: 0;
+    }
+
+    .category-row.header {
+      min-height: auto;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-bottom-color: #cfd6df;
+    }
+
+    .category-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .category-share {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .category-total {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 650;
+    }
+
+    .bar-extra {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 650;
+      margin-left: 6px;
+    }
+
+    .bar-extra.negative {
+      color: #dc2626;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: minmax(96px, 170px) minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .bar-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      min-width: 2px;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .bar-fill.teal {
+      background: var(--teal);
+    }
+
+    .amount {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .positive {
+      color: var(--good);
+    }
+
+    .negative {
+      color: var(--bad);
+    }
+
+    .table-wrap {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      overflow: auto;
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.88rem;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #fafbfc;
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      z-index: 1;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .concept {
+      max-width: 420px;
+      min-width: 260px;
+      line-height: 1.35;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      border-radius: 999px;
+      padding: 2px 9px;
+      font-size: 0.76rem;
+      font-weight: 650;
+      background: var(--surface-2);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .badge.confirmed {
+      background: var(--good-soft);
+      color: var(--good);
+    }
+
+    .badge.suggested {
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+
+    .badge.pending {
+      background: var(--bad-soft);
+      color: var(--bad);
+    }
+
+    .import-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .import-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .summary-item {
+      background: var(--surface-2);
+      border-radius: 8px;
+      padding: 10px;
+      min-width: 0;
+    }
+
+    .summary-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 650;
+    }
+
+    .summary-item strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 1.15rem;
+      overflow-wrap: anywhere;
+    }
+
+    .review-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .review-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .review-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .review-head strong {
+      display: block;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .review-meta {
+      color: var(--muted);
+      font-size: 0.84rem;
+      margin-top: 4px;
+    }
+
+    .review-controls {
+      display: grid;
+      grid-template-columns: minmax(160px, 1fr) auto auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .rules-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.34fr) minmax(0, 0.66fr);
+      gap: 14px;
+    }
+
+    .rule-form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .rules-list {
+      display: grid;
+      gap: 0;
+      max-height: 680px;
+      overflow: auto;
+      padding-right: 2px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .rule-item {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: minmax(260px, 1.4fr) minmax(160px, 0.7fr) minmax(130px, 0.55fr) minmax(140px, 0.65fr) 86px auto auto;
+      gap: 10px;
+      align-items: end;
+      background: #fff;
+    }
+
+    .rule-item:last-child {
+      border-bottom: none;
+    }
+
+    .rule-meta {
+      color: var(--muted);
+      font-size: 0.76rem;
+      margin-top: 4px;
+      overflow-wrap: anywhere;
+    }
+
+    .rule-readable {
+      align-self: center;
+      line-height: 1.35;
+      font-size: 0.86rem;
+    }
+
+    .rule-readable strong {
+      color: var(--ink);
+    }
+
+    .checkline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 40px;
+      color: var(--ink);
+      font-size: 0.86rem;
+      font-weight: 500;
+    }
+
+    .checkline input {
+      width: 18px;
+      min-height: 18px;
+      padding: 0;
+    }
+
+    .empty {
+      border: 1px dashed #b7c2cf;
+      border-radius: 8px;
+      padding: 22px;
+      text-align: center;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 920px) {
+      .topbar,
+      .status-line {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+
+      .top-actions {
+        justify-content: stretch;
+      }
+
+      .top-actions button {
+        flex: 1 1 150px;
+      }
+
+      .period-buttons.months {
+        flex-wrap: wrap;
+      }
+
+      .filters,
+      .period-filter,
+      .kpi-grid,
+      .content-grid,
+      .import-grid,
+      .summary-grid,
+      .rules-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app-shell {
+        padding: 12px;
+      }
+
+      .filters,
+      .period-filter,
+      .kpi-grid,
+      .content-grid,
+      .import-grid,
+      .summary-grid,
+      .review-controls,
+      .rules-grid,
+      .rule-item,
+      .category-donut-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .bar-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .bar-track {
+        grid-column: 1 / -1;
+        order: 3;
+      }
+
+      .review-head {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Finanzas familiares</h1>
+        <p id="dataMeta">Sin datos cargados</p>
+      </div>
+      <div class="top-actions">
+        <button id="loadJsonButton" class="subtle" type="button">Cargar JSON</button>
+        <button id="exportButton" class="primary" type="button">Exportar JSON</button>
+        <input id="jsonInput" class="hidden" type="file" accept=".json,application/json">
+      </div>
+    </header>
+
+    <nav class="tabs" aria-label="Vistas">
+      <button class="tab active" type="button" data-view="dashboardView">Dashboard</button>
+      <button class="tab" type="button" data-view="transactionsView">Movimientos</button>
+      <button class="tab" type="button" data-view="reviewView">Revisión</button>
+      <button class="tab" type="button" data-view="rulesView">Reglas</button>
+      <button class="tab" type="button" data-view="importView">Importar</button>
+    </nav>
+
+    <div class="status-line">
+      <div id="message" class="message">Carga finanzas-data.json para empezar.</div>
+      <span id="dirtyBadge" class="badge">Sin cambios</span>
+    </div>
+
+    <section class="filters" aria-label="Filtros">
+      <label>Desde
+        <input id="startFilter" type="date">
+      </label>
+      <label>Hasta
+        <input id="endFilter" type="date">
+      </label>
+      <label>Categoría
+        <details id="categoryFilterDropdown" class="check-dropdown">
+          <summary id="categoryFilterSummary">Categorías</summary>
+          <div id="categoryFilterOptions" class="check-menu"></div>
+        </details>
+      </label>
+      <label>Origen de cuenta
+        <div id="accountFilter" class="button-filter"></div>
+      </label>
+      <label>Titular
+        <div id="titularFilter" class="button-filter"></div>
+      </label>
+    </section>
+
+    <section class="period-filter" aria-label="Filtros por periodo">
+      <div class="period-group">
+        <div class="period-title">Año</div>
+        <div id="yearFilter" class="year-wheel"></div>
+      </div>
+      <div class="period-group">
+        <div class="period-title">Trimestre</div>
+        <div id="quarterFilter" class="period-buttons quarters"></div>
+      </div>
+      <div class="period-group">
+        <div class="period-title">Mes</div>
+        <div id="periodMonthFilter" class="period-buttons months"></div>
+      </div>
+    </section>
+
+    <main>
+      <section id="dashboardView" class="view active">
+        <div class="kpi-grid">
+          <div class="kpi bad"><span>Gastos</span><strong id="kpiExpenses">0,00 €</strong></div>
+          <div class="kpi good"><span>Ingresos</span><strong id="kpiIncome">0,00 €</strong></div>
+          <div class="kpi"><span>Neto</span><strong id="kpiNet">0,00 €</strong></div>
+          <div class="kpi"><span>Por revisar</span><strong id="kpiReview">0</strong></div>
+        </div>
+
+        <div class="content-grid">
+          <div class="panel wide-panel">
+            <h2>Flujo de caja mensual</h2>
+            <div id="cashFlowChart" class="cashflow-chart"></div>
+          </div>
+          <div class="panel">
+            <h2>Gastos por categoría</h2>
+            <div id="categorySummary" class="category-table"></div>
+          </div>
+          <div class="panel">
+            <h2>Gastos por mes</h2>
+            <div id="monthChart" class="chart-list"></div>
+          </div>
+          <div class="panel">
+            <h2>Origen de cuenta</h2>
+            <div id="accountChart" class="chart-list"></div>
+          </div>
+          <div class="panel">
+            <h2>Titular</h2>
+            <div id="titularChart" class="chart-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="transactionsView" class="view">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha valor</th>
+                <th>Cuenta</th>
+                <th>Concepto</th>
+                <th>Categoría</th>
+                <th>Estado</th>
+                <th>Importe</th>
+                <th>Saldo</th>
+              </tr>
+            </thead>
+            <tbody id="transactionsTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="reviewView" class="view">
+        <div class="panel">
+          <h2>Movimientos por revisar</h2>
+          <div id="reviewList" class="review-list"></div>
+        </div>
+      </section>
+
+      <section id="rulesView" class="view">
+        <div class="rules-grid">
+          <div class="panel">
+            <h2>Nueva regla</h2>
+            <div class="rule-form">
+              <label>Texto que debe aparecer
+                <input id="rulePatternInput" type="text" placeholder="Ej. MERCADONA, OPENAI, NATURGY">
+              </label>
+              <label>Categoría
+                <select id="ruleCategoryInput"></select>
+              </label>
+              <label>Origen de cuenta
+                <select id="ruleAccountInput"></select>
+              </label>
+              <label>Confianza
+                <input id="ruleConfidenceInput" type="number" min="50" max="100" value="95">
+              </label>
+              <button id="addRuleButton" class="primary" type="button">Guardar regla</button>
+              <button id="applyRulesButton" type="button">Aplicar a pendientes</button>
+            </div>
+          </div>
+          <div class="panel">
+            <h2>Reglas existentes</h2>
+            <div id="rulesList" class="rules-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="importView" class="view">
+        <div class="import-grid">
+          <div class="panel">
+            <h2>Datos compartidos</h2>
+            <input id="jsonInputInline" type="file" accept=".json,application/json">
+            <div class="import-actions">
+              <button id="loadJsonInlineButton" class="subtle" type="button">Cargar datos</button>
+              <button id="newDataButton" type="button">Empezar vacío</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>Movimientos del banco</h2>
+            <input id="bankInput" type="file" accept=".xls,.html,text/html" multiple>
+            <div class="import-actions">
+              <button id="importBankButton" class="primary" type="button">Importar movimientos</button>
+              <button id="clearImportButton" type="button">Limpiar selección</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top: 14px;">
+          <h2>Última importación</h2>
+          <div id="importSummary" class="summary-grid"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const EMPTY_DATA = {
+      schemaVersion: 1,
+      generatedAt: new Date().toISOString(),
+      metadata: { primaryReportDate: "valueDate", currency: "EUR" },
+      categories: [{ name: "Sin categoría", aliases: ["Sin categoría"], transactionCount: 0 }],
+      accounts: [],
+      categoryRules: [],
+      transactions: []
+    };
+
+    const state = {
+      data: null,
+      activeView: "dashboardView",
+      dirty: false,
+      serverMode: location.protocol === "http:" || location.protocol === "https:",
+      filters: {
+        start: "",
+        end: "",
+        year: "",
+        quarter: "",
+        periodMonth: "",
+        excludedCategories: ["Regularización"],
+        account: [],
+        titular: []
+      },
+      lastImport: null
+    };
+
+    const moneyFormatter = new Intl.NumberFormat("es-ES", {
+      style: "currency",
+      currency: "EUR",
+      maximumFractionDigits: 2
+    });
+
+    const integerFormatter = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0 });
+    const chartColors = ["#2563eb", "#14b8a6", "#f97316", "#8b5cf6", "#e11d48", "#84cc16", "#06b6d4", "#f59e0b", "#64748b", "#db2777"];
+
+    const $ = (id) => document.getElementById(id);
+
+    function cloneEmptyData() {
+      return JSON.parse(JSON.stringify(EMPTY_DATA));
+    }
+
+    function stripAccents(value) {
+      return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function normalizeText(value) {
+      return stripAccents(value)
+        .toLowerCase()
+        .replace(/\b\d{4}-\d{2}-\d{2}\b/g, " ")
+        .replace(/\b\d{10,}\b/g, " ")
+        .replace(/[^a-z0-9]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function canonicalAccountName(value) {
+      const text = String(value || "").trim();
+      const key = normalizeText(text);
+      if (key === "nomina") return "Nómina";
+      if (key === "cuentas") return "Cuentas";
+      if (key === "cristina") return "Cristina";
+      if (key === "credito") return "Crédito";
+      return text || "Sin cuenta";
+    }
+
+    function normalizeAccountId(value) {
+      const text = String(value || "");
+      const key = normalizeText(text);
+      if (["account cristina", "hist cristina", "bank 00730100590788939851", "cristina", "cristina 9851"].includes(key)) return "account_cristina";
+      if (["account nomina", "hist nomina", "bank 00730100510793829162", "nomina", "nomina 9162"].includes(key)) return "account_nomina";
+      if (["account cuentas", "hist cuentas", "bank 00730100580789699253", "cuentas", "cuentas 9253"].includes(key)) return "account_cuentas";
+      if (["account credito", "hist credito", "credito"].includes(key)) return "account_credito";
+      return text || null;
+    }
+
+    function accountLabel(accountId) {
+      if (accountId === "account_cristina") return "Cristina";
+      if (accountId === "account_nomina") return "Nómina";
+      if (accountId === "account_cuentas") return "Cuentas";
+      if (accountId === "account_credito") return "Crédito";
+      return accountId || "";
+    }
+
+    function accountHolder(accountId, fallback = "") {
+      if (accountId === "account_cristina") return "Cristina";
+      if (accountId === "account_nomina" || accountId === "account_cuentas" || accountId === "account_credito") return "Nicolás";
+      const key = normalizeText(fallback);
+      if (key.includes("paz") || key.includes("cristina")) return "Cristina";
+      if (key.includes("perez") || key.includes("nicolas") || key === "nomina" || key === "cuentas") return "Nicolás";
+      return fallback || "Sin titular";
+    }
+
+    function canonicalCategory(value) {
+      const text = String(value || "").trim();
+      const key = normalizeText(text);
+      if (!key) return "Sin categoría";
+      if (key === "cafe") return "Café";
+      if (key === "compras") return "Compras";
+      if (key === "entretenimiento") return "Entretenimiento";
+      if (key === "suscripciones") return "Suscripciones";
+      if (key === "ayes") return "Ayes";
+      if (key === "sin categoria") return "Sin categoría";
+      const known = (state.data?.categories || []).find((category) => normalizeText(category.name) === key);
+      return known ? known.name : text.slice(0, 1).toUpperCase() + text.slice(1);
+    }
+
+    function fnv1a32(value) {
+      let hash = 0x811c9dc5;
+      for (let index = 0; index < value.length; index += 1) {
+        hash ^= value.charCodeAt(index);
+        hash = Math.imul(hash, 0x01000193) >>> 0;
+      }
+      return hash.toString(16).padStart(8, "0");
+    }
+
+    function stableTransactionId(tx) {
+      const parts = [
+        tx.accountId || "",
+        tx.operationDate || "",
+        tx.valueDate || "",
+        normalizeText(tx.concept || ""),
+        Number(tx.amountCents || 0),
+        tx.balanceCents === null || tx.balanceCents === undefined ? "" : Number(tx.balanceCents)
+      ];
+      return "tx_" + fnv1a32(parts.join("|"));
+    }
+
+    function parseSpanishCents(value) {
+      if (value === null || value === undefined) return null;
+      if (typeof value === "number" && Number.isFinite(value)) return Math.round(value * 100);
+      let text = String(value)
+        .replace(/EUR/gi, "")
+        .replace(/\u00a0/g, "")
+        .replace(/\s+/g, "")
+        .trim();
+      if (!text) return null;
+      const hasComma = text.includes(",");
+      const hasDot = text.includes(".");
+      if (hasComma && hasDot) {
+        text = text.lastIndexOf(",") > text.lastIndexOf(".")
+          ? text.replace(/\./g, "").replace(",", ".")
+          : text.replace(/,/g, "");
+      } else if (hasComma) {
+        text = text.replace(/\./g, "").replace(",", ".");
+      }
+      const parsed = Number(text);
+      return Number.isFinite(parsed) ? Math.round(parsed * 100) : null;
+    }
+
+    function parseBankDate(value) {
+      const match = String(value || "").trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if (!match) return null;
+      return `${match[3]}-${match[2]}-${match[1]}`;
+    }
+
+    function formatMoney(cents) {
+      return moneyFormatter.format((Number(cents) || 0) / 100);
+    }
+
+    function formatPointMoney(cents) {
+      const euros = (Number(cents) || 0) / 100;
+      const abs = Math.abs(euros);
+      const sign = euros < 0 ? "-" : "";
+      if (abs >= 1000000) return `${sign}${(abs / 1000000).toLocaleString("es-ES", { maximumFractionDigits: 1 })}M€`;
+      if (abs >= 1000) return `${sign}${(abs / 1000).toLocaleString("es-ES", { maximumFractionDigits: 1 })}k€`;
+      return `${sign}${abs.toLocaleString("es-ES", { maximumFractionDigits: 0 })}€`;
+    }
+
+    function formatCompactMoney(cents) {
+      const euros = (Number(cents) || 0) / 100;
+      const abs = Math.abs(euros);
+      const sign = euros < 0 ? "-" : "";
+      if (abs >= 1000000) return `${sign}${(abs / 1000000).toLocaleString("es-ES", { maximumFractionDigits: 1 })}M€`;
+      if (abs >= 1000) return `${sign}${(abs / 1000).toLocaleString("es-ES", { maximumFractionDigits: 1 })}k€`;
+      return formatMoney(cents);
+    }
+
+    function formatDate(value) {
+      if (!value) return "";
+      const parts = String(value).split("-");
+      if (parts.length !== 3) return value;
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+
+    function monthKey(value) {
+      return value ? String(value).slice(0, 7) : "";
+    }
+
+    function quarterKey(value) {
+      if (!value || String(value).length < 7) return "";
+      const month = Number(String(value).slice(5, 7));
+      if (!month) return "";
+      return `Q${Math.ceil(month / 3)}`;
+    }
+
+    function formatMonthLabel(value) {
+      if (!value || !/^\d{4}-\d{2}$/.test(value)) return value || "";
+      const names = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      const year = value.slice(2, 4);
+      const monthIndex = Number(value.slice(5, 7)) - 1;
+      return `${names[monthIndex] || value.slice(5, 7)} ${year}`;
+    }
+
+    function formatMonthShort(value) {
+      if (!value || !/^\d{4}-\d{2}$/.test(value)) return value || "";
+      const names = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+      const monthIndex = Number(value.slice(5, 7)) - 1;
+      return names[monthIndex] || value.slice(5, 7);
+    }
+
+    function readFileAsText(file, encoding = "utf-8") {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(reader.error || new Error("No se pudo leer el archivo"));
+        reader.readAsText(file, encoding);
+      });
+    }
+
+    function ensureDataShape(raw) {
+      const data = {
+        ...cloneEmptyData(),
+        ...raw,
+        metadata: { ...cloneEmptyData().metadata, ...(raw?.metadata || {}) },
+        categories: Array.isArray(raw?.categories) ? raw.categories : [],
+        accounts: Array.isArray(raw?.accounts) ? raw.accounts : [],
+        categoryRules: Array.isArray(raw?.categoryRules) ? raw.categoryRules : [],
+        transactions: Array.isArray(raw?.transactions) ? raw.transactions : []
+      };
+
+      data.transactions = data.transactions
+        .filter((tx) => tx && tx.concept && tx.valueDate)
+        .map((tx) => {
+          const accountId = normalizeAccountId(tx.accountId || tx.accountLabel || tx.accountName);
+          if (!accountId) return null;
+          const label = accountLabel(accountId) || canonicalAccountName(tx.accountName || tx.accountLabel || tx.titular);
+          const category = canonicalCategory(tx.category || "Sin categoría");
+          return {
+            ...tx,
+            accountId,
+            accountName: label,
+            accountLabel: label,
+            titular: accountHolder(accountId, tx.titular || tx.accountName || ""),
+            amountCents: Number(tx.amountCents || 0),
+            balanceCents: tx.balanceCents === null || tx.balanceCents === undefined ? null : Number(tx.balanceCents),
+            category,
+            categoryStatus: tx.categoryStatus || (category === "Sin categoría" ? "pending" : "confirmed"),
+            categoryConfidence: Number(tx.categoryConfidence || 0),
+            movementType: tx.movementType || (Number(tx.amountCents || 0) >= 0 ? "Ingreso" : "Egreso")
+          };
+        })
+        .filter(Boolean);
+
+      data.categoryRules = data.categoryRules
+        .filter((rule) => rule && rule.pattern && rule.category)
+        .map((rule) => ({
+          id: rule.id || "rule_" + fnv1a32(normalizeText(rule.pattern)),
+          kind: rule.kind || "contains",
+          pattern: String(rule.pattern),
+          normalizedPattern: rule.normalizedPattern || normalizeText(rule.pattern),
+          accountId: rule.accountId ? normalizeAccountId(rule.accountId) : null,
+          accountName: rule.accountId ? accountLabel(normalizeAccountId(rule.accountId)) : null,
+          category: canonicalCategory(rule.category),
+          confidence: Number(rule.confidence || 0.85),
+          hits: Number(rule.hits || 1),
+          source: rule.source || "manual"
+        }));
+
+      syncDerivedLists(data);
+      return data;
+    }
+
+    function syncDerivedLists(data = state.data) {
+      if (!data) return;
+      const categoryMap = new Map();
+      for (const category of data.categories || []) {
+        const name = canonicalCategory(category.name);
+        categoryMap.set(name, {
+          name,
+          aliases: Array.from(new Set([...(category.aliases || []), name])),
+          transactionCount: 0
+        });
+      }
+      const accountMap = new Map();
+      for (const account of data.accounts || []) {
+        accountMap.set(account.id, { ...account, transactionCount: 0 });
+      }
+
+      for (const tx of data.transactions || []) {
+        const accountId = normalizeAccountId(tx.accountId || tx.accountLabel || tx.accountName);
+        if (!accountId) continue;
+        tx.accountId = accountId;
+        tx.accountName = accountLabel(accountId);
+        tx.accountLabel = accountLabel(accountId);
+        tx.titular = accountHolder(accountId, tx.titular || "");
+        tx.category = canonicalCategory(tx.category);
+        if (!categoryMap.has(tx.category)) {
+          categoryMap.set(tx.category, { name: tx.category, aliases: [tx.category], transactionCount: 0 });
+        }
+        categoryMap.get(tx.category).transactionCount += 1;
+
+        if (tx.accountId && !accountMap.has(tx.accountId)) {
+          accountMap.set(tx.accountId, {
+            id: tx.accountId,
+            label: tx.accountLabel || tx.accountName || tx.titular || "Sin cuenta",
+            titular: tx.titular || tx.accountName || "Sin titular",
+            accountNumber: tx.accountNumber || null,
+            last4: tx.accountLast4 || null,
+            description: tx.accountDescription || "",
+            transactionCount: 0
+          });
+        }
+        if (tx.accountId) {
+          accountMap.get(tx.accountId).transactionCount += 1;
+        }
+      }
+
+      if (!categoryMap.has("Sin categoría")) {
+        categoryMap.set("Sin categoría", { name: "Sin categoría", aliases: ["Sin categoría"], transactionCount: 0 });
+      }
+      data.categories = Array.from(categoryMap.values()).sort((a, b) => a.name.localeCompare(b.name, "es"));
+      data.accounts = Array.from(accountMap.values()).sort((a, b) => String(a.label).localeCompare(String(b.label), "es"));
+    }
+
+    function setMessage(text, type = "") {
+      const node = $("message");
+      if (!text) {
+        node.textContent = "";
+        node.className = "message hidden";
+        return;
+      }
+      node.innerHTML = text
+        ? `<span class="message-text">${escapeHtml(text)}</span><button class="message-close" type="button" aria-label="Borrar mensaje">×</button>`
+        : "";
+      node.className = `message ${type}`.trim();
+    }
+
+    async function apiRequest(path, options = {}) {
+      const response = await fetch(path, {
+        cache: "no-store",
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+        ...options
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.error || "La app local no respondió bien");
+      }
+      return payload;
+    }
+
+    function markDirty(value = true) {
+      state.dirty = value;
+      if (state.serverMode) {
+        $("dirtyBadge").textContent = "Guardado automático";
+        $("dirtyBadge").className = "badge confirmed";
+        return;
+      }
+      $("dirtyBadge").textContent = value ? "Cambios sin exportar" : "Sin cambios";
+      $("dirtyBadge").className = value ? "badge suggested" : "badge";
+    }
+
+    async function loadJsonFile(file) {
+      if (!file) {
+        setMessage("Selecciona finanzas-data.json.", "warn");
+        return;
+      }
+      try {
+        const text = await readFileAsText(file, "utf-8");
+        const parsed = JSON.parse(text);
+        state.data = ensureDataShape(parsed);
+        state.lastImport = null;
+        markDirty(false);
+        setMessage(`${file.name} cargado con ${integerFormatter.format(state.data.transactions.length)} movimientos.`, "good");
+        render();
+      } catch (error) {
+        setMessage(`No se pudo cargar el JSON: ${error.message}`, "warn");
+      }
+    }
+
+    async function loadServerData() {
+      try {
+        const data = await apiRequest("/api/data");
+        state.data = ensureDataShape(data);
+        state.lastImport = null;
+        markDirty(false);
+        setMessage("Datos cargados automáticamente desde la carpeta.", "good");
+        render();
+      } catch (error) {
+        setMessage(`No pude cargar la base local: ${error.message}`, "warn");
+      }
+    }
+
+    function startEmptyData() {
+      state.data = ensureDataShape(cloneEmptyData());
+      state.lastImport = null;
+      markDirty(true);
+      setMessage("Base vacía creada.", "good");
+      render();
+    }
+
+    function exportJson() {
+      if (!state.data) {
+        setMessage("No hay datos para exportar.", "warn");
+        return;
+      }
+      syncDerivedLists();
+      const payload = {
+        ...state.data,
+        exportedAt: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {
+        type: "application/json;charset=utf-8"
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "finanzas-data.json";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      markDirty(false);
+      setMessage("JSON exportado.", "good");
+    }
+
+    async function importBankFromServer() {
+      if (!state.serverMode) return;
+      try {
+        setMessage("Buscando Movimientos de Cuenta*.xls en la carpeta...");
+        const payload = await apiRequest("/api/import-bank", { method: "POST", body: "{}" });
+        state.data = ensureDataShape(payload.data);
+        state.lastImport = payload.summary;
+        markDirty(false);
+        setMessage(
+          `${integerFormatter.format(payload.summary.newCount)} nuevos, ${integerFormatter.format(payload.summary.duplicateCount)} duplicados omitidos, ${integerFormatter.format(payload.summary.pendingCount)} por revisar. Guardado automáticamente.`,
+          payload.summary.errorCount ? "warn" : "good"
+        );
+        render();
+      } catch (error) {
+        setMessage(`No pude importar desde la carpeta: ${error.message}`, "warn");
+      }
+    }
+
+    function extractMerchant(concept) {
+      const text = String(concept || "").replace(/\s+/g, " ").trim();
+      const patterns = [
+        /COMPRA EN\s+(.+?)(?:,\s*CON LA TARJETA| EL \d{4}-\d{2}-\d{2}|$)/i,
+        /RECIBO\s+(.+?)(?:\s+N[º°]|\s+NO\s+RECIBO|\s+REF\.?|$)/i,
+        /TRANSFERENCIA(?:\s+INMEDIATA)?\s+(?:A FAVOR DE|DE)\s+(.+?)(?:\s+CONCEPTO|,\s*CONCEPTO|$)/i,
+        /BIZUM\s+(?:A FAVOR DE|DE)\s+(.+?)(?:\s+CONCEPTO|$)/i
+      ];
+      for (const pattern of patterns) {
+        const match = text.match(pattern);
+        if (match?.[1]) {
+          return match[1].replace(/\s+/g, " ").trim().replace(/[ .,:;-]+$/g, "").slice(0, 80);
+        }
+      }
+      return text.split(/\s+/).slice(0, 4).join(" ").slice(0, 80) || null;
+    }
+
+    function buildExactCategoryMap() {
+      const grouped = new Map();
+      for (const tx of state.data?.transactions || []) {
+        if (tx.categoryStatus !== "confirmed" || !tx.category || tx.category === "Sin categoría") continue;
+        const key = normalizeText(tx.concept);
+        if (!key) continue;
+        if (!grouped.has(key)) grouped.set(key, new Map());
+        grouped.get(key).set(tx.category, (grouped.get(key).get(tx.category) || 0) + 1);
+      }
+      const result = new Map();
+      for (const [key, counts] of grouped.entries()) {
+        const entries = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
+        const total = entries.reduce((sum, item) => sum + item[1], 0);
+        const [category, hits] = entries[0];
+        const confidence = hits / total;
+        if (confidence >= 0.85) result.set(key, { category, confidence });
+      }
+      return result;
+    }
+
+    function inferCategory(tx, exactMap = buildExactCategoryMap()) {
+      const key = normalizeText(tx.concept);
+      const exact = exactMap.get(key);
+      if (exact) {
+        return {
+          category: exact.category,
+          categoryStatus: "confirmed",
+          categoryConfidence: 0.98,
+          categorySource: "exact"
+        };
+      }
+
+      const normalizedConcept = normalizeText(tx.concept);
+      let bestRule = null;
+      for (const rule of state.data?.categoryRules || []) {
+        const ruleAccount = rule.accountId ? normalizeAccountId(rule.accountId) : null;
+        if (ruleAccount && ruleAccount !== tx.accountId) continue;
+        const pattern = rule.normalizedPattern || normalizeText(rule.pattern);
+        if (!pattern || !normalizedConcept.includes(pattern)) continue;
+        const score = (ruleAccount ? 1000 : 0) + pattern.length + Number(rule.confidence || 0);
+        if (!bestRule || score > bestRule.score) {
+          bestRule = { ...rule, score };
+        }
+      }
+      if (bestRule) {
+        return {
+          category: canonicalCategory(bestRule.category),
+          categoryStatus: "suggested",
+          categoryConfidence: Math.max(0.5, Math.min(0.97, Number(bestRule.confidence || 0.8))),
+          categorySource: bestRule.source || "rule"
+        };
+      }
+
+      return {
+        category: "Sin categoría",
+        categoryStatus: "pending",
+        categoryConfidence: 0,
+        categorySource: "none"
+      };
+    }
+
+    function inferAccountMeta(rawMeta) {
+      const digits = String(rawMeta.accountNumber || "").replace(/\D/g, "");
+      const last4 = digits.slice(-4) || null;
+      const description = String(rawMeta.accountDescription || "");
+      const titular = String(rawMeta.titular || "").trim();
+      let label = titular;
+      if (/CRISTINA|PAZ RODRIGUEZ/i.test(titular)) label = "Cristina";
+      else if (/CORRIENTE/i.test(description)) label = "Cuentas";
+      else if (/N[ÓO]MINA/i.test(description)) label = "Nómina";
+      label = canonicalAccountName(label);
+      const accountId = normalizeAccountId(label) || `account_${normalizeText(label)}`;
+      return {
+        accountId,
+        accountName: accountLabel(accountId) || label,
+        accountLabel: accountLabel(accountId) || label,
+        accountNumber: rawMeta.accountNumber || null,
+        accountLast4: last4,
+        accountDescription: description || null,
+        titular: accountHolder(accountId, titular || label)
+      };
+    }
+
+    function parseBankHtml(html, fileName) {
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const rows = Array.from(doc.querySelectorAll("tr"));
+      const meta = {
+        accountNumber: null,
+        accountDescription: null,
+        titular: null
+      };
+      const transactions = [];
+
+      for (const row of rows) {
+        const cells = Array.from(row.cells)
+          .map((cell) => cell.textContent.replace(/\s+/g, " ").trim())
+          .filter(Boolean);
+        if (cells.length >= 2 && /^Número de Cuenta/i.test(cells[0])) meta.accountNumber = cells[1];
+        else if (cells.length >= 2 && /^Descripción/i.test(cells[0])) meta.accountDescription = cells[1];
+        else if (cells.length >= 2 && /^Titular/i.test(cells[0])) meta.titular = cells[1];
+        else if (cells.length === 5 && parseBankDate(cells[0]) && parseBankDate(cells[1])) {
+          const account = inferAccountMeta(meta);
+          const amountCents = parseSpanishCents(cells[3]);
+          const balanceCents = parseSpanishCents(cells[4]);
+          if (amountCents === null) continue;
+          const tx = {
+            ...account,
+            operationDate: parseBankDate(cells[0]),
+            valueDate: parseBankDate(cells[1]),
+            concept: cells[2],
+            amountCents,
+            balanceCents,
+            movementType: amountCents >= 0 ? "Ingreso" : "Egreso",
+            source: {
+              type: "bank-html",
+              file: fileName
+            }
+          };
+          tx.id = stableTransactionId(tx);
+          transactions.push(tx);
+        }
+      }
+      return { meta, transactions };
+    }
+
+    async function importBankFiles(files) {
+      if (!state.data) {
+        state.data = ensureDataShape(cloneEmptyData());
+      }
+      const selected = Array.from(files || []);
+      if (!selected.length) {
+        setMessage("Selecciona uno o varios Movimientos de Cuenta.", "warn");
+        return;
+      }
+
+      const existingIds = new Set((state.data.transactions || []).map((tx) => tx.id));
+      const batchIds = new Set();
+      const exactMap = buildExactCategoryMap();
+      const imported = [];
+      const parsedFiles = [];
+      let duplicates = 0;
+      let parseErrors = 0;
+
+      for (const file of selected) {
+        try {
+          const html = await readFileAsText(file, "windows-1252");
+          const parsed = parseBankHtml(html, file.name);
+          parsedFiles.push({ file: file.name, count: parsed.transactions.length });
+          for (const tx of parsed.transactions) {
+            if (existingIds.has(tx.id) || batchIds.has(tx.id)) {
+              duplicates += 1;
+              continue;
+            }
+            const category = inferCategory(tx, exactMap);
+            imported.push({ ...tx, ...category });
+            batchIds.add(tx.id);
+          }
+        } catch (error) {
+          parseErrors += 1;
+        }
+      }
+
+      state.data.transactions.push(...imported);
+      for (const tx of imported) {
+        existingIds.add(tx.id);
+      }
+      syncDerivedLists();
+      const pending = imported.filter((tx) => tx.categoryStatus !== "confirmed").length;
+      state.lastImport = {
+        files: parsedFiles,
+        newCount: imported.length,
+        duplicateCount: duplicates,
+        pendingCount: pending,
+        errorCount: parseErrors
+      };
+      markDirty(imported.length > 0 || parseErrors > 0);
+      setMessage(
+        `${integerFormatter.format(imported.length)} nuevos, ${integerFormatter.format(duplicates)} duplicados omitidos, ${integerFormatter.format(pending)} por revisar.`,
+        parseErrors ? "warn" : "good"
+      );
+      render();
+    }
+
+    function filteredTransactions() {
+      const transactions = state.data?.transactions || [];
+      return transactions
+        .filter((tx) => {
+          const reportDate = tx.valueDate || tx.operationDate || "";
+          if (state.filters.year && reportDate.slice(0, 4) !== state.filters.year) return false;
+          if (state.filters.quarter && quarterKey(reportDate) !== state.filters.quarter) return false;
+          if (state.filters.periodMonth && reportDate.slice(5, 7) !== state.filters.periodMonth) return false;
+          if (state.filters.start && reportDate < state.filters.start) return false;
+          if (state.filters.end && reportDate > state.filters.end) return false;
+          const excludedCategories = selectedFilterValues(state.filters.excludedCategories);
+          if (excludedCategories.includes(tx.category)) return false;
+          const selectedAccounts = selectedFilterValues(state.filters.account);
+          const selectedTitulares = selectedFilterValues(state.filters.titular);
+          if (selectedAccounts.length && !selectedAccounts.includes(tx.accountId)) return false;
+          if (selectedTitulares.length && !selectedTitulares.includes(tx.titular)) return false;
+          return true;
+        })
+        .sort((a, b) => String(b.valueDate || b.operationDate).localeCompare(String(a.valueDate || a.operationDate)));
+    }
+
+    function groupExpenses(transactions, keyGetter) {
+      const grouped = new Map();
+      for (const tx of transactions) {
+        if (tx.amountCents >= 0) continue;
+        const key = keyGetter(tx) || "Sin dato";
+        grouped.set(key, (grouped.get(key) || 0) + Math.abs(tx.amountCents));
+      }
+      return Array.from(grouped.entries()).sort((a, b) => b[1] - a[1]);
+    }
+
+    function groupNetSpend(transactions, keyGetter) {
+      const grouped = new Map();
+      for (const tx of transactions) {
+        const key = keyGetter(tx) || "Sin dato";
+        grouped.set(key, (grouped.get(key) || 0) + Number(tx.amountCents || 0));
+      }
+      return Array.from(grouped.entries())
+        .map(([key, net]) => [key, Math.max(0, -net)])
+        .filter(([, value]) => value > 0)
+        .sort((a, b) => b[1] - a[1]);
+    }
+
+    function groupExpensesByMonth(transactions) {
+      const grouped = new Map();
+      for (const tx of transactions) {
+        if (tx.amountCents >= 0) continue;
+        const key = monthKey(tx.valueDate || tx.operationDate);
+        if (!key) continue;
+        grouped.set(key, (grouped.get(key) || 0) + Math.abs(tx.amountCents));
+      }
+      return Array.from(grouped.entries()).sort((a, b) => a[0].localeCompare(b[0])).slice(-12);
+    }
+
+    function groupCashByMonth(transactions) {
+      const grouped = new Map();
+      for (const tx of transactions) {
+        const key = monthKey(tx.valueDate || tx.operationDate);
+        if (!key) continue;
+        if (!grouped.has(key)) grouped.set(key, { expense: 0, income: 0 });
+        const bucket = grouped.get(key);
+        if (tx.amountCents < 0) bucket.expense += Math.abs(tx.amountCents);
+        else bucket.income += tx.amountCents;
+      }
+      return Array.from(grouped.entries())
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .slice(-12)
+        .map(([month, value]) => [month, value.expense, { income: value.income, deficit: Math.max(0, value.expense - value.income) }]);
+    }
+
+    function renderBars(node, rows, options = {}) {
+      const max = Math.max(...rows.map((row) => row[1]), 0);
+      if (!rows.length || max === 0) {
+        node.innerHTML = '<div class="empty">Sin movimientos para estos filtros.</div>';
+        return;
+      }
+      const total = rows.reduce((sum, row) => sum + Number(row[1] || 0), 0);
+      node.innerHTML = rows.slice(0, options.limit || 10).map(([label, value, meta]) => {
+        const width = Math.max(3, Math.round((value / max) * 100));
+        const fillClass = options.teal ? "bar-fill teal" : "bar-fill";
+        const displayLabel = options.labelFormatter ? options.labelFormatter(label) : label;
+        const percentage = options.showPercent && total > 0 ? `${((value / total) * 100).toLocaleString("es-ES", { maximumFractionDigits: 1 })}% · ` : "";
+        const deficit = meta?.deficit > 0 ? ` <span class="bar-extra negative">por debajo ${formatCompactMoney(meta.deficit)}</span>` : "";
+        return `
+          <div class="bar-row">
+            <div class="bar-label" title="${escapeHtml(displayLabel)}">${escapeHtml(displayLabel)}</div>
+            <div class="bar-track"><div class="${fillClass}" style="width:${width}%"></div></div>
+            <div class="amount">${percentage}${formatMoney(value)}${deficit}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderCashFlow(transactions) {
+      const grouped = new Map();
+      for (const tx of transactions) {
+        const key = monthKey(tx.valueDate || tx.operationDate);
+        if (!key) continue;
+        if (!grouped.has(key)) grouped.set(key, { income: 0, expense: 0, net: 0 });
+        const bucket = grouped.get(key);
+        if (tx.amountCents >= 0) bucket.income += tx.amountCents;
+        else bucket.expense += Math.abs(tx.amountCents);
+        bucket.net += tx.amountCents;
+      }
+      const months = Array.from(grouped.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+      if (!months.length) {
+        $("cashFlowChart").innerHTML = '<div class="empty">Sin flujo para estos filtros.</div>';
+        return;
+      }
+      const rows = months.map(([month, value]) => {
+        return {
+          month,
+          year: month.slice(0, 4),
+          income: value.income,
+          expense: -value.expense,
+          cumulative: value.net
+        };
+      });
+      const values = rows.flatMap((row) => [row.income, row.expense, row.cumulative]);
+      if (values.every((value) => value === 0)) {
+        $("cashFlowChart").innerHTML = '<div class="empty">Sin flujo para estos filtros.</div>';
+        return;
+      }
+
+      const width = Math.max(820, rows.length * 104 + 120);
+      const height = 390;
+      const padding = { top: 64, right: 44, bottom: 74, left: 58 };
+      const plotWidth = width - padding.left - padding.right;
+      const plotHeight = height - padding.top - padding.bottom;
+      const rawMin = Math.min(0, ...values);
+      const rawMax = Math.max(0, ...values);
+      const rawSpan = Math.max(rawMax - rawMin, Math.max(Math.abs(rawMax), Math.abs(rawMin), 1));
+      const minDomain = rawMin - rawSpan * 0.22;
+      const maxDomain = rawMax + rawSpan * 0.22;
+      const xFor = (index) => rows.length === 1
+        ? padding.left + plotWidth / 2
+        : padding.left + (plotWidth * index) / (rows.length - 1);
+      const yFor = (value) => padding.top + ((maxDomain - value) / (maxDomain - minDomain)) * plotHeight;
+      const zeroY = yFor(0);
+      const pointSets = {
+        income: rows.map((row, index) => ({ x: xFor(index), y: yFor(row.income), value: row.income })),
+        expense: rows.map((row, index) => ({ x: xFor(index), y: yFor(row.expense), value: row.expense })),
+        cumulative: rows.map((row, index) => ({ x: xFor(index), y: yFor(row.cumulative), value: row.cumulative }))
+      };
+      const linePath = (points) => {
+        if (points.length === 1) return `M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`;
+        return points.map((point, index) => `${index ? "L" : "M"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
+      };
+      const areaPath = (points) => {
+        if (points.length === 1) {
+          const point = points[0];
+          return `M ${(point.x - 1).toFixed(2)} ${zeroY.toFixed(2)} L ${point.x.toFixed(2)} ${point.y.toFixed(2)} L ${(point.x + 1).toFixed(2)} ${zeroY.toFixed(2)} Z`;
+        }
+        return [
+          `M ${points[0].x.toFixed(2)} ${zeroY.toFixed(2)}`,
+          ...points.map((point) => `L ${point.x.toFixed(2)} ${point.y.toFixed(2)}`),
+          `L ${points.at(-1).x.toFixed(2)} ${zeroY.toFixed(2)}`,
+          "Z"
+        ].join(" ");
+      };
+      const yearGroups = [];
+      for (let index = 0; index < rows.length; index += 1) {
+        const current = rows[index].year;
+        const previous = yearGroups.at(-1);
+        if (!previous || previous.year !== current) {
+          yearGroups.push({ year: current, start: index, end: index });
+        } else {
+          previous.end = index;
+        }
+      }
+      const guides = rows.map((row, index) => {
+        const x = xFor(index);
+        return `<line class="cashflow-guide" x1="${x.toFixed(2)}" y1="${padding.top}" x2="${x.toFixed(2)}" y2="${(height - padding.bottom + 10).toFixed(2)}"></line>`;
+      }).join("");
+      const labelPlans = rows.map((row, index) => {
+        const candidates = [
+          { key: "income", y: pointSets.income[index].y - 14 },
+          { key: "expense", y: pointSets.expense[index].y + 22 },
+          { key: "cumulative", y: pointSets.cumulative[index].y + (row.cumulative >= 0 ? -30 : 34) }
+        ].sort((a, b) => a.y - b.y);
+        const minGap = 18;
+        const minY = 22;
+        const maxY = height - padding.bottom + 26;
+        candidates[0].y = Math.max(minY, candidates[0].y);
+        for (let cursor = 1; cursor < candidates.length; cursor += 1) {
+          candidates[cursor].y = Math.max(candidates[cursor].y, candidates[cursor - 1].y + minGap);
+        }
+        const overflow = candidates.at(-1).y - maxY;
+        if (overflow > 0) {
+          for (const candidate of candidates) candidate.y -= overflow;
+        }
+        if (candidates[0].y < minY) {
+          const underflow = minY - candidates[0].y;
+          for (const candidate of candidates) candidate.y += underflow;
+        }
+        return Object.fromEntries(candidates.map((candidate) => [candidate.key, candidate.y]));
+      });
+      const pointMarkup = (key, radius) => pointSets[key].map((point, index) => `
+        <circle class="cashflow-point ${key}" cx="${point.x.toFixed(2)}" cy="${point.y.toFixed(2)}" r="${radius}"></circle>
+        <text class="cashflow-value ${key}" x="${point.x.toFixed(2)}" y="${labelPlans[index][key].toFixed(2)}" text-anchor="middle">${escapeHtml(formatPointMoney(point.value))}</text>
+      `).join("");
+      const monthLabels = rows.map((row, index) => `
+        <text class="cashflow-month-label" x="${xFor(index).toFixed(2)}" y="${height - 34}" text-anchor="middle">${escapeHtml(formatMonthShort(row.month))}</text>
+      `).join("");
+      const yearLabels = yearGroups.map((group) => {
+        const x = (xFor(group.start) + xFor(group.end)) / 2;
+        return `<text class="cashflow-year-label" x="${x.toFixed(2)}" y="${height - 12}" text-anchor="middle">${escapeHtml(group.year)}</text>`;
+      }).join("");
+
+      $("cashFlowChart").innerHTML = `
+        <svg class="cashflow-svg" viewBox="0 0 ${width} ${height}" style="min-width:${width}px" role="img" aria-label="Flujo de caja mensual con ingresos, egresos y neto mensual">
+          <title>Flujo de caja mensual</title>
+          <defs>
+            <linearGradient id="cashIncomeGradient" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#16a34a" stop-opacity="0.22"></stop>
+              <stop offset="100%" stop-color="#16a34a" stop-opacity="0"></stop>
+            </linearGradient>
+            <linearGradient id="cashExpenseGradient" x1="0" x2="0" y1="1" y2="0">
+              <stop offset="0%" stop-color="#ef4444" stop-opacity="0.22"></stop>
+              <stop offset="100%" stop-color="#ef4444" stop-opacity="0"></stop>
+            </linearGradient>
+          </defs>
+          ${guides}
+          <line class="cashflow-zero" x1="${padding.left}" y1="${zeroY.toFixed(2)}" x2="${width - padding.right}" y2="${zeroY.toFixed(2)}"></line>
+          <path class="cashflow-area income" d="${areaPath(pointSets.income)}" fill="url(#cashIncomeGradient)"></path>
+          <path class="cashflow-area expense" d="${areaPath(pointSets.expense)}" fill="url(#cashExpenseGradient)"></path>
+          <path class="cashflow-line income" d="${linePath(pointSets.income)}"></path>
+          <path class="cashflow-line expense" d="${linePath(pointSets.expense)}"></path>
+          <path class="cashflow-line cumulative" d="${linePath(pointSets.cumulative)}"></path>
+          ${pointMarkup("income", 4)}
+          ${pointMarkup("expense", 4)}
+          ${pointMarkup("cumulative", 5)}
+          ${monthLabels}
+          ${yearLabels}
+        </svg>
+      `;
+    }
+
+    function renderCategorySummary(transactions) {
+      const netRows = groupNetSpend(transactions, (tx) => tx.category);
+      const totalNet = netRows.reduce((sum, row) => sum + row[1], 0);
+      if (!netRows.length || totalNet === 0) {
+        $("categorySummary").innerHTML = '<div class="empty">Sin gastos para estos filtros.</div>';
+        return;
+      }
+      let cursor = 0;
+      const segments = netRows.slice(0, 12).map(([label, net], index) => {
+        const start = cursor;
+        const end = cursor + (net / totalNet) * 100;
+        cursor = end;
+        return `${chartColors[index % chartColors.length]} ${start.toFixed(2)}% ${end.toFixed(2)}%`;
+      }).join(", ");
+      const rows = netRows.slice(0, 12).map(([label, net], index) => {
+        const pct = (net / totalNet) * 100;
+        return `
+          <div class="category-row">
+            <span class="legend-dot" style="background:${chartColors[index % chartColors.length]}"></span>
+            <span class="category-name" title="${escapeHtml(label)}">${escapeHtml(label)}</span>
+            <span class="category-share">${pct.toLocaleString("es-ES", { maximumFractionDigits: 1 })}% · ${formatCompactMoney(net)}</span>
+          </div>
+        `;
+      }).join("");
+      $("categorySummary").innerHTML = `
+        <div class="category-donut-layout">
+          <div class="donut" style="background: conic-gradient(${segments})">
+            <div class="donut-total">${formatCompactMoney(totalNet)}<span>neto</span></div>
+          </div>
+          <div class="category-table">
+            <div class="category-row header">
+              <span></span>
+              <span>Categoría</span>
+              <span class="category-share">% · neto</span>
+            </div>
+            ${rows}
+          </div>
+        </div>
+        <div class="category-total">
+          <span>Total neto: ${formatCompactMoney(totalNet)}</span>
+        </div>
+      `;
+    }
+
+    function renderDashboard(transactions) {
+      const expenses = transactions.filter((tx) => tx.amountCents < 0).reduce((sum, tx) => sum + Math.abs(tx.amountCents), 0);
+      const income = transactions.filter((tx) => tx.amountCents > 0).reduce((sum, tx) => sum + tx.amountCents, 0);
+      const net = transactions.reduce((sum, tx) => sum + tx.amountCents, 0);
+      const review = transactions.filter((tx) => tx.categoryStatus !== "confirmed").length;
+
+      $("kpiExpenses").textContent = formatCompactMoney(expenses);
+      $("kpiExpenses").title = formatMoney(expenses);
+      $("kpiIncome").textContent = formatCompactMoney(income);
+      $("kpiIncome").title = formatMoney(income);
+      $("kpiNet").textContent = formatCompactMoney(net);
+      $("kpiNet").title = formatMoney(net);
+      $("kpiNet").className = net >= 0 ? "positive" : "negative";
+      $("kpiReview").textContent = integerFormatter.format(review);
+
+      renderCashFlow(transactions);
+      renderCategorySummary(transactions);
+      renderBars($("monthChart"), groupCashByMonth(transactions), { limit: 12, teal: true, labelFormatter: formatMonthLabel });
+      renderBars($("accountChart"), groupExpenses(transactions, (tx) => tx.accountLabel || tx.accountName), { limit: 8, showPercent: true });
+      renderBars($("titularChart"), groupExpenses(transactions, (tx) => tx.titular || tx.accountName), { limit: 8, teal: true, showPercent: true });
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function statusLabel(status) {
+      if (status === "confirmed") return "Confirmada";
+      if (status === "suggested") return "Sugerida";
+      return "Pendiente";
+    }
+
+    function renderTransactions(transactions) {
+      const rows = transactions.slice(0, 500).map((tx) => `
+        <tr>
+          <td>${formatDate(tx.valueDate)}<br><span class="badge">Op. ${formatDate(tx.operationDate)}</span></td>
+          <td>${escapeHtml(tx.accountLabel || tx.accountName)}<br><span class="badge">${escapeHtml(tx.titular || "")}</span></td>
+          <td class="concept">${escapeHtml(tx.concept)}</td>
+          <td>${escapeHtml(tx.category || "Sin categoría")}</td>
+          <td><span class="badge ${tx.categoryStatus || "pending"}">${statusLabel(tx.categoryStatus)}</span></td>
+          <td class="amount ${tx.amountCents >= 0 ? "positive" : "negative"}">${formatMoney(tx.amountCents)}</td>
+          <td class="amount">${tx.balanceCents === null || tx.balanceCents === undefined ? "" : formatMoney(tx.balanceCents)}</td>
+        </tr>
+      `).join("");
+      $("transactionsTable").innerHTML = rows || '<tr><td colspan="7"><div class="empty">Sin movimientos para estos filtros.</div></td></tr>';
+    }
+
+    function categoryOptions(selected) {
+      const options = (state.data?.categories || [])
+        .filter((category) => category.name !== "Sin categoría")
+        .map((category) => `<option value="${escapeHtml(category.name)}" ${category.name === selected ? "selected" : ""}>${escapeHtml(category.name)}</option>`)
+        .join("");
+      return `<option value="" ${selected ? "" : "selected"}>Elegir</option>${options}`;
+    }
+
+    function renderReview() {
+      const reviewItems = (state.data?.transactions || [])
+        .filter((tx) => tx.categoryStatus !== "confirmed")
+        .sort((a, b) => String(b.valueDate || b.operationDate).localeCompare(String(a.valueDate || a.operationDate)))
+        .slice(0, 200);
+
+      if (!reviewItems.length) {
+        $("reviewList").innerHTML = '<div class="empty">Todo está categorizado.</div>';
+        return;
+      }
+
+      $("reviewList").innerHTML = reviewItems.map((tx) => {
+        const confidence = Math.round(Number(tx.categoryConfidence || 0) * 100);
+        const merchant = extractMerchant(tx.concept);
+        return `
+          <article class="review-item" data-id="${escapeHtml(tx.id)}">
+            <div class="review-head">
+              <div>
+                <strong>${escapeHtml(tx.concept)}</strong>
+                <div class="review-meta">${formatDate(tx.valueDate)} · ${escapeHtml(tx.accountLabel || tx.accountName)} · ${formatMoney(tx.amountCents)}</div>
+              </div>
+              <span class="badge ${tx.categoryStatus || "pending"}">${statusLabel(tx.categoryStatus)} · ${confidence}%</span>
+            </div>
+            <div class="review-controls">
+              <label>Categoría
+                <select data-role="category">${categoryOptions(tx.category === "Sin categoría" ? "" : tx.category)}</select>
+              </label>
+              <label class="checkline">
+                <input type="checkbox" data-role="rule" ${merchant ? "checked" : ""}>
+                Guardar regla
+              </label>
+              <button type="button" class="primary" data-role="confirm">Confirmar</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function addRuleForTransaction(tx, category) {
+      const merchant = extractMerchant(tx.concept);
+      const normalizedPattern = normalizeText(merchant);
+      if (!merchant || normalizedPattern.length < 4) return;
+      const accountId = normalizeAccountId(tx.accountId);
+      const existing = state.data.categoryRules.find((rule) => {
+        const samePattern = (rule.normalizedPattern || normalizeText(rule.pattern)) === normalizedPattern;
+        const sameAccount = (rule.accountId ? normalizeAccountId(rule.accountId) : null) === accountId;
+        return samePattern && sameAccount;
+      });
+      if (existing) {
+        existing.category = category;
+        existing.confidence = 0.95;
+        existing.hits = Number(existing.hits || 0) + 1;
+        existing.source = "manual";
+        existing.accountId = accountId;
+        existing.accountName = accountLabel(accountId);
+        return;
+      }
+      const ruleKey = `${accountId || ""}|${normalizedPattern}`;
+      state.data.categoryRules.push({
+        id: "rule_" + fnv1a32(ruleKey),
+        kind: "contains",
+        field: "concept",
+        pattern: merchant,
+        normalizedPattern,
+        accountId,
+        accountName: accountLabel(accountId),
+        category,
+        confidence: 0.95,
+        hits: 1,
+        source: "manual"
+      });
+    }
+
+    function applyRulesToReviewQueue() {
+      const exactMap = buildExactCategoryMap();
+      let changed = 0;
+      for (const tx of state.data.transactions) {
+        if (tx.categoryStatus === "confirmed") continue;
+        const inferred = inferCategory(tx, exactMap);
+        if (inferred.category !== "Sin categoría") {
+          if (tx.category !== inferred.category || tx.categoryStatus !== inferred.categoryStatus) changed += 1;
+          tx.category = inferred.category;
+          tx.categoryStatus = inferred.categoryStatus;
+          tx.categoryConfidence = inferred.categoryConfidence;
+          tx.categorySource = inferred.categorySource;
+        }
+      }
+      return changed;
+    }
+
+    function renderRules() {
+      const selectOptions = categoryOptions("");
+      $("ruleCategoryInput").innerHTML = selectOptions;
+      $("ruleAccountInput").innerHTML = ruleAccountOptions("");
+      $("ruleConfidenceInput").value = $("ruleConfidenceInput").value || "95";
+      const rules = (state.data?.categoryRules || [])
+        .slice()
+        .sort((a, b) => `${a.accountName || "Todas"} ${a.pattern}`.localeCompare(`${b.accountName || "Todas"} ${b.pattern}`, "es"));
+      if (!rules.length) {
+        $("rulesList").innerHTML = '<div class="empty">Aún no hay reglas.</div>';
+        return;
+      }
+      $("rulesList").innerHTML = rules.map((rule) => `
+        <article class="rule-item" data-id="${escapeHtml(rule.id)}">
+          <div class="rule-readable">
+            Si <strong>concepto</strong> contiene <strong>${escapeHtml(rule.pattern)}</strong>, entonces categoría <strong>${escapeHtml(rule.category)}</strong>.
+            <div class="rule-meta">Cuenta: ${escapeHtml(rule.accountName || "Cualquier cuenta")} · Confianza ${Math.round(Number(rule.confidence || 0.85) * 100)}% · ${escapeHtml(rule.source || "manual")} · ${integerFormatter.format(rule.hits || 0)} usos</div>
+          </div>
+          <label>Texto contiene
+            <input data-role="pattern" type="text" value="${escapeHtml(rule.pattern)}">
+          </label>
+          <label>Cuenta
+            <select data-role="account">${ruleAccountOptions(rule.accountId || "")}</select>
+          </label>
+          <label>Categoría
+            <select data-role="category">${categoryOptions(rule.category)}</select>
+          </label>
+          <label>Confianza
+            <input data-role="confidence" type="number" min="50" max="100" value="${Math.round(Number(rule.confidence || 0.85) * 100)}">
+          </label>
+          <button type="button" class="primary" data-role="save-rule">Guardar</button>
+          <button type="button" class="danger" data-role="delete-rule">Eliminar</button>
+        </article>
+      `).join("");
+    }
+
+    function ruleAccountOptions(selected) {
+      const accounts = [{ id: "", label: "Cualquier cuenta" }, ...(state.data?.accounts || [])];
+      return accounts.map((account) => {
+        const id = account.id || "";
+        return `<option value="${escapeHtml(id)}" ${id === (selected || "") ? "selected" : ""}>${escapeHtml(account.label)}</option>`;
+      }).join("");
+    }
+
+    function upsertLocalRule(ruleInput) {
+      const pattern = String(ruleInput.pattern || "").trim();
+      const normalizedPattern = normalizeText(pattern);
+      if (!pattern || normalizedPattern.length < 2) {
+        throw new Error("Escribe el texto de la regla.");
+      }
+      const category = canonicalCategory(ruleInput.category);
+      if (!category || category === "Sin categoría") {
+        throw new Error("Elige una categoría.");
+      }
+      const confidence = Math.max(0.5, Math.min(1, Number(ruleInput.confidence || 0.95)));
+      const accountId = ruleInput.accountId ? normalizeAccountId(ruleInput.accountId) : null;
+      const existing = (state.data.categoryRules || []).find((rule) => {
+        const samePattern = (rule.normalizedPattern || normalizeText(rule.pattern)) === normalizedPattern;
+        const sameAccount = (rule.accountId ? normalizeAccountId(rule.accountId) : null) === accountId;
+        return rule.id === ruleInput.id || (samePattern && sameAccount);
+      });
+      if (existing) {
+        existing.pattern = pattern;
+        existing.normalizedPattern = normalizedPattern;
+        existing.field = "concept";
+        existing.accountId = accountId;
+        existing.accountName = accountLabel(accountId);
+        existing.category = category;
+        existing.confidence = confidence;
+        existing.source = existing.source || "manual";
+      } else {
+        const ruleKey = `${accountId || ""}|${normalizedPattern}`;
+        state.data.categoryRules.push({
+          id: "rule_" + fnv1a32(ruleKey),
+          kind: "contains",
+          field: "concept",
+          pattern,
+          normalizedPattern,
+          accountId,
+          accountName: accountLabel(accountId),
+          category,
+          confidence,
+          hits: 0,
+          source: "manual"
+        });
+      }
+    }
+
+    async function saveRule(ruleInput) {
+      try {
+        if (state.serverMode) {
+          await apiRequest("/api/rule", {
+            method: "POST",
+            body: JSON.stringify(ruleInput)
+          });
+          const payload = await apiRequest("/api/rules/apply", { method: "POST", body: "{}" });
+          state.data = ensureDataShape(payload.data);
+          markDirty(false);
+          setMessage(`Regla guardada. ${integerFormatter.format(payload.changed)} movimientos pendientes actualizados.`, "good");
+        } else {
+          upsertLocalRule(ruleInput);
+          const changed = applyRulesToReviewQueue();
+          markDirty(true);
+          setMessage(`Regla guardada. ${integerFormatter.format(changed)} movimientos pendientes actualizados.`, "good");
+        }
+        syncDerivedLists();
+        render();
+      } catch (error) {
+        setMessage(error.message, "warn");
+      }
+    }
+
+    async function deleteRule(ruleId) {
+      try {
+        if (state.serverMode) {
+          const data = await apiRequest("/api/rule/delete", {
+            method: "POST",
+            body: JSON.stringify({ id: ruleId })
+          });
+          state.data = ensureDataShape(data);
+          markDirty(false);
+        } else {
+          state.data.categoryRules = (state.data.categoryRules || []).filter((rule) => rule.id !== ruleId);
+          markDirty(true);
+        }
+        setMessage("Regla eliminada.", "good");
+        render();
+      } catch (error) {
+        setMessage(`No pude eliminar la regla: ${error.message}`, "warn");
+      }
+    }
+
+    async function applyAllRules() {
+      try {
+        if (state.serverMode) {
+          const payload = await apiRequest("/api/rules/apply", { method: "POST", body: "{}" });
+          state.data = ensureDataShape(payload.data);
+          markDirty(false);
+          setMessage(`${integerFormatter.format(payload.changed)} movimientos pendientes actualizados.`, "good");
+        } else {
+          const changed = applyRulesToReviewQueue();
+          syncDerivedLists();
+          markDirty(changed > 0);
+          setMessage(`${integerFormatter.format(changed)} movimientos pendientes actualizados.`, "good");
+        }
+        render();
+      } catch (error) {
+        setMessage(`No pude aplicar reglas: ${error.message}`, "warn");
+      }
+    }
+
+    async function confirmReviewItem(item) {
+      const tx = state.data.transactions.find((entry) => entry.id === item.dataset.id);
+      if (!tx) return;
+      const selected = item.querySelector('[data-role="category"]').value;
+      if (!selected) {
+        setMessage("Elige una categoría.", "warn");
+        return;
+      }
+      if (state.serverMode) {
+        try {
+          const saveRule = item.querySelector('[data-role="rule"]').checked;
+          const data = await apiRequest("/api/category", {
+            method: "POST",
+            body: JSON.stringify({ id: tx.id, category: selected, saveRule })
+          });
+          state.data = ensureDataShape(data);
+          markDirty(false);
+          setMessage("Categoría guardada automáticamente.", "good");
+          render();
+        } catch (error) {
+          setMessage(`No pude guardar la categoría: ${error.message}`, "warn");
+        }
+        return;
+      }
+      tx.category = canonicalCategory(selected);
+      tx.categoryStatus = "confirmed";
+      tx.categoryConfidence = 1;
+      tx.categorySource = "manual";
+      if (item.querySelector('[data-role="rule"]').checked) {
+        addRuleForTransaction(tx, tx.category);
+        applyRulesToReviewQueue();
+      }
+      syncDerivedLists();
+      markDirty(true);
+      setMessage("Categoría guardada.", "good");
+      render();
+    }
+
+    function renderImportSummary() {
+      if (!state.lastImport) {
+        $("importSummary").innerHTML = `
+          <div class="summary-item"><span>Nuevos</span><strong>0</strong></div>
+          <div class="summary-item"><span>Duplicados</span><strong>0</strong></div>
+          <div class="summary-item"><span>Por revisar</span><strong>0</strong></div>
+          <div class="summary-item"><span>Errores</span><strong>0</strong></div>
+        `;
+        return;
+      }
+      $("importSummary").innerHTML = `
+        <div class="summary-item"><span>Nuevos</span><strong>${integerFormatter.format(state.lastImport.newCount)}</strong></div>
+        <div class="summary-item"><span>Duplicados</span><strong>${integerFormatter.format(state.lastImport.duplicateCount)}</strong></div>
+        <div class="summary-item"><span>Por revisar</span><strong>${integerFormatter.format(state.lastImport.pendingCount)}</strong></div>
+        <div class="summary-item"><span>Errores</span><strong>${integerFormatter.format(state.lastImport.errorCount)}</strong></div>
+      `;
+    }
+
+    function renderFilterOptions() {
+      const data = state.data || cloneEmptyData();
+      const years = Array.from(new Set(data.transactions.map((tx) => String(tx.valueDate || tx.operationDate || "").slice(0, 4)).filter(Boolean))).sort();
+      const categories = data.categories.map((category) => category.name).sort((a, b) => a.localeCompare(b, "es"));
+      const accounts = data.accounts.slice().sort((a, b) => String(a.label).localeCompare(String(b.label), "es"));
+      const titulares = Array.from(new Set(data.transactions.map((tx) => tx.titular).filter(Boolean))).sort((a, b) => a.localeCompare(b, "es"));
+
+      renderYearWheel(years);
+      renderPeriodButtons($("quarterFilter"), [["Q1", "T1"], ["Q2", "T2"], ["Q3", "T3"], ["Q4", "T4"]], state.filters.quarter, "quarter");
+      renderPeriodButtons($("periodMonthFilter"), Array.from({ length: 12 }, (_, index) => {
+        const month = String(index + 1).padStart(2, "0");
+        return [month, formatMonthShort(`2026-${month}`)];
+      }), state.filters.periodMonth, "periodMonth");
+      renderCategoryFilter(categories);
+      renderChoiceButtons($("accountFilter"), accounts.map((account) => [account.id, account.label || account.id]), state.filters.account, "account");
+      renderChoiceButtons($("titularFilter"), titulares.map((titular) => [titular, titular]), state.filters.titular, "titular");
+      $("startFilter").value = state.filters.start;
+      $("endFilter").value = state.filters.end;
+    }
+
+    function selectedFilterValues(value) {
+      if (Array.isArray(value)) return value.filter(Boolean);
+      return value ? [value] : [];
+    }
+
+    function renderChoiceButtons(node, options, selected, filterKey) {
+      const selectedValues = new Set(selectedFilterValues(selected));
+      node.innerHTML = options.map(([value, label]) => {
+        const active = selectedValues.has(value);
+        return `<button type="button" class="choice-btn ${active ? "active" : ""}" data-filter-key="${filterKey}" data-value="${escapeHtml(value)}">${escapeHtml(label)}</button>`;
+      }).join("");
+    }
+
+    function renderPeriodButtons(node, options, selected, filterKey) {
+      node.innerHTML = options.map(([value, label]) => `
+        <button type="button" class="choice-btn ${value === selected ? "active" : ""}" data-period-key="${filterKey}" data-value="${escapeHtml(value)}">${escapeHtml(label)}</button>
+      `).join("");
+    }
+
+    function renderYearWheel(years) {
+      const values = years.length ? years : [String(new Date().getFullYear())];
+      const selected = state.filters.year && values.includes(state.filters.year) ? state.filters.year : "";
+      const activeIndex = selected ? values.indexOf(selected) : values.length - 1;
+      const previous = values[(activeIndex - 1 + values.length) % values.length];
+      const next = values[(activeIndex + 1) % values.length];
+      $("yearFilter").innerHTML = `
+        <button type="button" class="year-step" data-year-step="-1" aria-label="Año anterior">‹</button>
+        <button type="button" class="year-current ${selected ? "active" : ""}" data-year-current="true" title="Toca para limpiar el año">
+          <span class="year-adjacent">${escapeHtml(previous)}</span>
+          <span>${escapeHtml(selected || values[activeIndex])}</span>
+          <span class="year-adjacent">${escapeHtml(next)}</span>
+        </button>
+        <button type="button" class="year-step" data-year-step="1" aria-label="Año siguiente">›</button>
+      `;
+    }
+
+    function stepYearFilter(step) {
+      const years = Array.from(new Set((state.data?.transactions || [])
+        .map((tx) => String(tx.valueDate || tx.operationDate || "").slice(0, 4))
+        .filter(Boolean))).sort();
+      if (!years.length) return;
+      const currentIndex = state.filters.year && years.includes(state.filters.year)
+        ? years.indexOf(state.filters.year)
+        : years.length - 1;
+      const nextIndex = (currentIndex + step + years.length) % years.length;
+      state.filters.year = years[nextIndex];
+    }
+
+    function togglePeriodFilter(filterKey, value) {
+      state.filters[filterKey] = state.filters[filterKey] === value ? "" : value;
+      if (filterKey === "quarter" && state.filters[filterKey]) state.filters.periodMonth = "";
+      if (filterKey === "periodMonth" && state.filters[filterKey]) state.filters.quarter = "";
+    }
+
+    function renderCategoryFilter(categories) {
+      const excluded = new Set(selectedFilterValues(state.filters.excludedCategories));
+      const includedCount = categories.filter((category) => !excluded.has(category)).length;
+      const excludedCount = categories.length - includedCount;
+      $("categoryFilterSummary").textContent = excludedCount
+        ? `${integerFormatter.format(includedCount)} incluidas · ${integerFormatter.format(excludedCount)} excluidas`
+        : "Todas incluidas";
+      const orderedCategories = categories
+        .map((category) => ({ category, excluded: excluded.has(category) }))
+        .sort((a, b) => Number(b.excluded) - Number(a.excluded) || a.category.localeCompare(b.category, "es"));
+      $("categoryFilterOptions").innerHTML = orderedCategories.map(({ category, excluded: isExcluded }) => {
+        const checked = !excluded.has(category);
+        const count = state.data?.categories?.find((entry) => entry.name === category)?.transactionCount || 0;
+        return `
+          <label class="check-row ${isExcluded ? "excluded" : ""}">
+            <input type="checkbox" data-category="${escapeHtml(category)}" ${checked ? "checked" : ""}>
+            <span>${escapeHtml(category)}</span>
+            <span class="check-count">${integerFormatter.format(count)}</span>
+          </label>
+        `;
+      }).join("");
+    }
+
+    function toggleChoiceFilter(container, filterKey, value, event) {
+      if (!value) {
+        state.filters[filterKey] = [];
+        return;
+      }
+      const allValues = Array.from(container.querySelectorAll(".choice-btn"))
+        .map((button) => button.dataset.value || "")
+        .filter(Boolean);
+      const selected = new Set(selectedFilterValues(state.filters[filterKey]));
+      const multiSelect = Boolean(event?.ctrlKey || event?.metaKey);
+      if (!multiSelect) {
+        state.filters[filterKey] = selected.size === 1 && selected.has(value) ? [] : [value];
+        return;
+      }
+      if (selected.has(value)) selected.delete(value);
+      else selected.add(value);
+      state.filters[filterKey] = Array.from(selected).filter((item) => allValues.includes(item));
+    }
+
+    function setSelectOptions(select, options, selected) {
+      const current = selected || "";
+      select.innerHTML = options
+        .map(([value, label]) => `<option value="${escapeHtml(value)}" ${value === current ? "selected" : ""}>${escapeHtml(label)}</option>`)
+        .join("");
+    }
+
+    function renderMeta() {
+      if (!state.data) {
+        $("dataMeta").textContent = state.serverMode ? "Conectando con la carpeta local..." : "Sin datos cargados";
+        return;
+      }
+      const count = integerFormatter.format(state.data.transactions.length);
+      const lastDate = state.data.transactions
+        .map((tx) => tx.valueDate || tx.operationDate)
+        .filter(Boolean)
+        .sort()
+        .at(-1);
+      $("dataMeta").textContent = `${count} movimientos · último ${formatDate(lastDate) || "sin fecha"}${state.serverMode ? " · guardado automático" : ""}`;
+    }
+
+    function render() {
+      renderMeta();
+      renderFilterOptions();
+      const transactions = filteredTransactions();
+      renderDashboard(transactions);
+      renderTransactions(transactions);
+      renderReview();
+      renderRules();
+      renderImportSummary();
+    }
+
+    function setActiveView(viewId) {
+      state.activeView = viewId;
+      document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === viewId));
+      document.querySelectorAll(".tab").forEach((tab) => tab.classList.toggle("active", tab.dataset.view === viewId));
+    }
+
+    function bindEvents() {
+      $("loadJsonButton").addEventListener("click", () => $("jsonInput").click());
+      $("jsonInput").addEventListener("change", (event) => loadJsonFile(event.target.files[0]));
+      $("loadJsonInlineButton").addEventListener("click", () => loadJsonFile($("jsonInputInline").files[0]));
+      $("newDataButton").addEventListener("click", startEmptyData);
+      $("exportButton").addEventListener("click", exportJson);
+      $("importBankButton").addEventListener("click", () => {
+        if (state.serverMode) importBankFromServer();
+        else importBankFiles($("bankInput").files);
+      });
+      $("addRuleButton").addEventListener("click", () => saveRule({
+        pattern: $("rulePatternInput").value,
+        category: $("ruleCategoryInput").value,
+        accountId: $("ruleAccountInput").value,
+        confidence: Number($("ruleConfidenceInput").value || 95) / 100
+      }).then(() => {
+        $("rulePatternInput").value = "";
+      }));
+      $("applyRulesButton").addEventListener("click", applyAllRules);
+      $("clearImportButton").addEventListener("click", () => {
+        $("bankInput").value = "";
+        setMessage("Selección limpiada.");
+      });
+
+      $("message").addEventListener("click", (event) => {
+        if (!event.target.closest(".message-close")) return;
+        setMessage("");
+      });
+
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.addEventListener("click", () => setActiveView(tab.dataset.view));
+      });
+
+      for (const [id, key] of [
+        ["startFilter", "start"],
+        ["endFilter", "end"]
+      ]) {
+        $(id).addEventListener("change", (event) => {
+          state.filters[key] = event.target.value;
+          render();
+        });
+      }
+
+      $("yearFilter").addEventListener("click", (event) => {
+        const stepButton = event.target.closest("[data-year-step]");
+        if (stepButton) {
+          stepYearFilter(Number(stepButton.dataset.yearStep || 0));
+          render();
+          return;
+        }
+        const currentButton = event.target.closest("[data-year-current]");
+        if (currentButton) {
+          state.filters.year = "";
+          render();
+        }
+      });
+
+      for (const id of ["quarterFilter", "periodMonthFilter"]) {
+        $(id).addEventListener("click", (event) => {
+          const button = event.target.closest(".choice-btn");
+          if (!button) return;
+          togglePeriodFilter(button.dataset.periodKey, button.dataset.value || "");
+          render();
+        });
+      }
+
+      $("categoryFilterOptions").addEventListener("change", (event) => {
+        const input = event.target.closest('input[type="checkbox"][data-category]');
+        if (!input) return;
+        const category = input.dataset.category || "";
+        const excluded = new Set(selectedFilterValues(state.filters.excludedCategories));
+        if (input.checked) excluded.delete(category);
+        else excluded.add(category);
+        state.filters.excludedCategories = Array.from(excluded);
+        render();
+        $("categoryFilterDropdown").open = true;
+      });
+
+      $("accountFilter").addEventListener("click", (event) => {
+        const button = event.target.closest(".choice-btn");
+        if (!button) return;
+        toggleChoiceFilter($("accountFilter"), "account", button.dataset.value || "", event);
+        render();
+      });
+
+      $("titularFilter").addEventListener("click", (event) => {
+        const button = event.target.closest(".choice-btn");
+        if (!button) return;
+        toggleChoiceFilter($("titularFilter"), "titular", button.dataset.value || "", event);
+        render();
+      });
+
+      $("reviewList").addEventListener("click", (event) => {
+        const button = event.target.closest('[data-role="confirm"]');
+        if (!button) return;
+        const item = event.target.closest(".review-item");
+        if (item) confirmReviewItem(item);
+      });
+
+      $("rulesList").addEventListener("click", (event) => {
+        const item = event.target.closest(".rule-item");
+        if (!item) return;
+        const ruleId = item.dataset.id;
+        if (event.target.closest('[data-role="delete-rule"]')) {
+          deleteRule(ruleId);
+          return;
+        }
+        if (event.target.closest('[data-role="save-rule"]')) {
+          saveRule({
+            id: ruleId,
+            pattern: item.querySelector('[data-role="pattern"]').value,
+            accountId: item.querySelector('[data-role="account"]').value,
+            category: item.querySelector('[data-role="category"]').value,
+            confidence: Number(item.querySelector('[data-role="confidence"]').value || 95) / 100
+          });
+        }
+      });
+    }
+
+    function configureServerMode() {
+      if (!state.serverMode) return;
+      $("loadJsonButton").classList.add("hidden");
+      $("exportButton").textContent = "Descargar copia";
+      $("jsonInputInline").classList.add("hidden");
+      $("loadJsonInlineButton").classList.add("hidden");
+      $("newDataButton").classList.add("hidden");
+      $("bankInput").classList.add("hidden");
+      $("clearImportButton").classList.add("hidden");
+      $("importBankButton").textContent = "Actualizar desde la carpeta";
+      $("dirtyBadge").textContent = "Guardado automático";
+      $("dirtyBadge").className = "badge confirmed";
+    }
+
+    async function initApp() {
+      configureServerMode();
+      bindEvents();
+      render();
+      if (state.serverMode) {
+        await loadServerData();
+        await importBankFromServer();
+      }
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
