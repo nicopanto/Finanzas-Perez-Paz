@@ -1271,7 +1271,7 @@
       data: null,
       activeView: "dashboardView",
       dirty: false,
-      serverMode: location.protocol === "http:" || location.protocol === "https:",
+      serverMode: false,
       filters: {
         start: "",
         end: "",
@@ -1609,6 +1609,20 @@
         throw new Error(payload.error || "La app local no respondió bien");
       }
       return payload;
+    }
+
+    async function detectServerMode() {
+      if (!(location.protocol === "http:" || location.protocol === "https:")) return false;
+      try {
+        const response = await fetch("/api/data", { method: "GET", cache: "no-store" });
+        if (!response.ok) return false;
+        const contentType = response.headers.get("content-type") || "";
+        if (!contentType.includes("application/json")) return false;
+        await response.json();
+        return true;
+      } catch (error) {
+        return false;
+      }
     }
 
     function markDirty(value = true) {
@@ -2831,12 +2845,15 @@
     }
 
     async function initApp() {
+      state.serverMode = await detectServerMode();
       configureServerMode();
       bindEvents();
       render();
       if (state.serverMode) {
         await loadServerData();
         await importBankFromServer();
+      } else {
+        setMessage("Modo web público: carga finanzas-data.json o importa archivos del banco manualmente.", "warn");
       }
     }
 
